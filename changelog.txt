@@ -1,0 +1,9 @@
+cargBags_Aurora Changelog
+2.0
+- complete rewrite, make use of filters
+
+1.0.1
+- cargBags_Anywhere support
+
+1.0
+- fork of cargBags_Pernobilis

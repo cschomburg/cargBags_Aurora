@@ -1,0 +1,12 @@
+## Interface: 30200
+## Title: cargBags_Aurora
+## Author: Cargor
+## Version: 2.1
+## X-eMail: xconstruct@gmail.com
+## X-Website: http://www.xconstruct.net
+## RequiredDeps: cargBags
+## OptionalDeps: cargBags_Anywhere, oGlow
+## Notes: Filter-based layout for cargBags
+
+mainframe.lua
+aurora.lua
