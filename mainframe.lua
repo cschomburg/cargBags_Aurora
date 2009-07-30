@@ -101,9 +101,11 @@ local function TabOnClick(self)
 	local group = self.Group
 
 	if(parent.Active) then
+		if(parent.Active.OnDisable) then parent.Active:OnDisable() end
 		parent.Active:Hide()
 		parent.Active.Tab:SetAlpha(0.5)
 	end
+	if(group.OnEnable) then group:OnEnable() end
 	group:Show()
 	self:SetAlpha(1)
 	parent.Active = group

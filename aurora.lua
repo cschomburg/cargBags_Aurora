@@ -132,6 +132,8 @@ local onlyTradeGoods = function(item) return item.type == L.TradeGood end
 local onlyRecipes = function(item) return item.type == L.Recipe end
 local hideEmpty = function(item) return item.texture ~= nil end
 
+local disable = function() return false end
+
 -- Now we add the containers
 --  cargBags:Spawn( name , parentFrame ) spawns the container with that name
 --  object:SetFilter ( filterFunc, enabled ) adds a filter or disables one
@@ -143,11 +145,21 @@ mainFrame:SetPoint("RIGHT", 0, -5)
 local mainBag = mainFrame:CreateGroup("Main")
 local tradeBag = mainFrame:CreateGroup("Trade")
 local otherBag = mainFrame:CreateGroup("Other")
+local aioBag = mainFrame:CreateGroup("All")
 
 -- And the same with the bank frame
 local bankFrame = Aurora_Create_Frame("bank", 12)
 bankFrame:SetPoint("LEFT", 0, 5)
 local bankBag = bankFrame:CreateGroup("Bank")
+
+-- All in one
+local aio = cargBags:Spawn("cBags_AIO")
+	aio:SetFilter(onlyBags, true)
+	aio:SetFilter(disable, true)
+	aioBag:AddFrame(aio)
+
+aioBag.OnEnable = function() aio:SetFilter(disable, false) end
+aioBag.OnDisable = function() aio:SetFilter(disable, true) end
 
 -- Tradegoods
 local trade = cargBags:Spawn("cBags_Trade", "Tradegoods")
@@ -187,6 +199,7 @@ local cons = cargBags:Spawn("cBags_Consumables", "Consumables")
 
 local main 	= cargBags:Spawn("cBags_Main", "Main")
 	main:SetFilter(onlyBags, true)
+	main:SetFilter(hideEmpty, true)
 	mainBag:AddFrame(main)
 
 -- Bank frame and bank bags
