@@ -1,98 +1,29 @@
--- This function is only used inside the layout, so the cargBags-core doesn't care about it
--- It creates the border for glowing process in UpdateButton()
-
-
-local hasOGlow = oGlow and oGlow.RegisterPipe
-if(hasOGlow) then
-	local function dummy() end
-	oGlow:RegisterPipe('cargBags_Aurora', dummy, nil, dummy, [[The cargBags layout Aurora.]])
-	oGlow:RegisterFilterOnPipe('cargBags_Aurora', 'quality')
-	oGlow:RegisterFilterOnPipe('cargBags_Aurora', 'quest')
-end
-
--- The main function for updating an item button,
--- the item-table holds all data known about the item the button is holding, e.g.
---   bagID, slotID, texture, count, locked, quality - from GetContainerItemInfo()
---   link - well, from GetContainerItemLink() ofcourse ;)
---   name, link, rarity, level, minLevel, type, subType, stackCount, equipLoc - from GetItemInfo()
--- if you need cooldown item data, use self:RequestCooldownData()
-local UpdateButton = function(self, button, item)
-	button.Icon:SetTexture(item.texture)
+local PostUpdateButton = function(self, button, item)
 	if(item.texture and item.count == 1 and item.bindOn == "equip") then
 		button.Count:SetText("|cff00ff00BoE|r")
 		button.Count:Show()
-	else
-		SetItemButtonCount(button, item.count)
 	end
-	SetItemButtonDesaturated(button, item.locked, 0.5, 0.5, 0.5)
-
 	button.Icon:SetTexCoord(0.03, 0.98, 0.03, 0.98)
-
-	-- Color the button's border based on the item's rarity / quality!
-	if(hasOGlow) then
-		oGlow:CallFilters('cargBags_Aurora', button, item.link)
-	elseif(oGlow) then
-		oGlow(button, item.link)
-	end
 end
 
--- Updates if the item is locked (currently moved by user)
---   bagID, slotID, texture, count, locked, quality - from GetContainerItemInfo()
--- if you need all item data, use self:RequestItemData()
-local UpdateButtonLock = function(self, button, item)
-	SetItemButtonDesaturated(button, item.locked, 0.5, 0.5, 0.5)
-end
-
--- Updates the item's cooldown
---   cdStart, cdFinish, cdEnable - from GetContainerItemCooldown()
--- if you need all item data, use self:RequestItemData()
-local UpdateButtonCooldown = function(self, button, item)
-	if(button.Cooldown) then
-		CooldownFrame_SetTimer(button.Cooldown, item.cdStart, item.cdFinish, item.cdEnable) 
-	end
-end
-
--- The function for positioning the item buttons in the bag object
-local UpdateButtonPositions = function(self)
-	local button
-	local col, row = 0, 0
-
-	local margin = self.Caption and 15 or 0
-	for _, button in self:IterateButtons() do
-		button:ClearAllPoints()
-		local xPos = col * 38 + 10
-		local yPos = -1 * row * 38 - margin
-
-		button:SetPoint("TOPLEFT", self, "TOPLEFT", xPos, yPos)	 
-		if(col >= self.MainFrame.Columns-1) then	 
-			col = 0	 
-			row = row + 1	 
-		else	 
-			col = col + 1	 
-		end
-	end
-
-	-- This variable stores the size of the item button container
-	self:SetHeight((row + (col>0 and 1 or 0)) * 38 + margin)
-	if(self.Parent.UpdateDimensions) then self.Parent:UpdateDimensions() end -- Update the parent bag's height
+local UpdateDimensions = function(self, height)
+	self:SetHeight(height + (self.Caption and 15 or 0))
+	self.Parent:UpdateDimensions()
 end
 
 -- Function is called after a button was added to an object
 -- Please note that the buttons are in most cases recycled and not new created
-local PostAddButton = function(self, button, bag)
-	if(not button.NormalTexture) then return end
+local PostCreateButton = function(self, button)
 	button.NormalTexture:SetAlpha(0.5)
 end
 
 -- Style of the bag and its contents
-local func = function(settings, self, name, text)
+cargBags:RegisterStyle("Aurora", function(self, text)
 	self:EnableMouse(true)
 
-	self.UpdateButtonPositions = UpdateButtonPositions
-	self.UpdateButton = UpdateButton
-	self.UpdateButtonLock = UpdateButtonLock
-	self.UpdateButtonCooldown = UpdateButtonCooldown
-	self.PostAddButton = PostAddButton
+	self.UpdateDimensions = UpdateDimensions
+	self.PostUpdateButton = PostUpdateButton
+	self.PostCreateButton = PostCreateButton
 
 	self:SetWidth(1)
 	self:SetHeight(1)
@@ -103,13 +34,9 @@ local func = function(settings, self, name, text)
 		caption:SetText(text)
 		caption:SetPoint("TOPLEFT")
 		self.Caption = caption
+		self.yOffset = -15
 	end
-
-	return self
-end
-
--- Register the style with cargBags
-cargBags:RegisterStyle("Aurora", setmetatable({}, {__call = func}))
+end)
 
 -- Localization
 local L = {}

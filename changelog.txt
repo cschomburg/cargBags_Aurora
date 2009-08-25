@@ -1,4 +1,7 @@
 cargBags_Aurora Changelog
+2.4
+- rewrite following 1.4 core
+
 2.0
 - complete rewrite, make use of filters
 

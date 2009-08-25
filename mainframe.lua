@@ -65,6 +65,7 @@ local function AddFrame(self, frame, pos)
 		tinsert(self.Frames, frame)
 	end
 	frame.MainFrame = self.Parent
+	frame.Columns = frame.MainFrame.Columns
 	frame:SetParent(self)
 	frame:SetWidth(self.Parent:GetWidth())
 	frame.Parent = self
